@@ -1,6 +1,6 @@
 # electron-vue
 
-> a desktop client based on github hosting service
+> a electron-vue client
 
 #### Build Setup
 
