@@ -10,5 +10,10 @@
 </script>
 
 <style lang="stylus">
-  /* CSS */
+#app {
+  color red
+}
+img {
+  width 100%
+}
 </style>
