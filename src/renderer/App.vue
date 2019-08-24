@@ -5,7 +5,7 @@
 
 <script>
   export default {
-    name: 'ego-note'
+    name: 'electron-vue-start'
   }
 </script>
 

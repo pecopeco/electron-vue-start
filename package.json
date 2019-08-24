@@ -19,7 +19,7 @@
     "postinstall": "npm run lint:fix"
   },
   "build": {
-    "productName": "ego-note",
+    "productName": "electron-vue-start",
     "appId": "com.example.yourapp",
     "directories": {
       "output": "build"
