@@ -3,44 +3,84 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import store from './store'
-import config from './config'
 
-import { Message } from 'element-ui'
+import ElementUI, { Message } from 'element-ui'
+
 import 'element-ui/lib/theme-chalk/index.css'
-
 import fly from 'flyio'
 import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer'
+import mixin from './mixin'
 
 installExtension(REACT_DEVELOPER_TOOLS).then((name) => console.log(`Added Extension:  ${name}`)).catch((err) => console.log('An error occurred: ', err))
 
-Vue.prototype.$config = config
+Vue.mixin(mixin)
+Vue.use(ElementUI)
 
-// fly全局配置
-function request (url, form, type) {
+let config = {
+  api_url: 'https://test.baidu.com'
+}
+
+let requestUrl, requestForm
+
+// 重复请求延迟
+function delayRequest () {
+  setTimeout(() => {
+    requestUrl = ''
+    requestForm = {}
+  }, 300)
+}
+
+// 判断两个对象属性是否完全相同
+function isObjectValueEqual (objA, objB) {
+  let aProps = Object.getOwnPropertyNames(objA)
+  let bProps = Object.getOwnPropertyNames(objB)
+  if (aProps.length !== bProps.length) {
+    return false
+  }
+  for (let i = 0; i < aProps.length; i++) {
+    let propName = aProps[i]
+    let propA = objA[propName]
+    let propB = objB[propName]
+    if (typeof (propA) === 'object') {
+      if (this.isObjectValueEqual(propA, propB)) {
+        return true
+      } else {
+        return false
+      }
+    } else if (propA !== propB) {
+      return false
+    }
+  }
+  return true
+}
+
+function request (url, form = {}, type) {
+  // 拦截重复请求
+  if (requestUrl === url && isObjectValueEqual(requestForm, form)) {
+    return
+  }
+  requestUrl = url
+  requestForm = JSON.parse(JSON.stringify(form))
+
   let compleForm = form
   // let presetForm = {
   //   orgName: 123456
   // }
   // Object.assign(compleForm, presetForm)
-  if (type === 'post' || type === 'delete' || type === 'put') {
-    let formData = new FormData()
-    for (let key in form) {
-      formData.append(key, form[key])
-    }
-    compleForm = form
-  }
-  return fly.request(url, compleForm, {
+  return fly.request(config.api_url + url, compleForm, {
     method: type,
     timeout: 5000
   }).then((res) => {
+    delayRequest()
     if (type === 'delete' || res.status === 204) {
       return res.text()
-    } else if (res.data.state === 'T' || res.status === 200) {
+    } else if (res.status === 200) {
       return res.data
     } else {
       Message(JSON.parse(res.data).error.msg)
     }
   }).catch((err) => {
+    delayRequest()
     const codeMessage = {
       200: '服务器成功返回请求的数据.',
       201: '新建或修改数据成功.',
