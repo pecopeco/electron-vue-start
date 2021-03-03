@@ -55,7 +55,7 @@
   "dependencies": {
     "element-ui": "^2.13.0",
     "flyio": "^0.6.14",
-    "pug": "^2.0.4",
+    "pug": "^3.0.1",
     "pug-plain-loader": "^1.0.0",
     "vue": "^2.6.11",
     "vue-electron": "^1.0.6",
